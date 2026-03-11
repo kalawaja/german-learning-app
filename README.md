@@ -1,50 +1,46 @@
-# Welcome to your Expo app 👋
+# German Vocabulary Learning App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A minimalist German vocabulary app for iOS and Android built with **React Native**, **Expo**, **TypeScript**, and **SQLite**.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Word types**: Nouns, Verbs, Adjectives, Others — filter by type
+- **Noun cards**: Article (der/die/das) and plural; color-coded (der=blue, die=red, das=green, die plural=orange); example sentences; meaning
+- **Verb cards**: Regularity (regelmäßig / unregelmäßig), transparent green/red background; conjugations (Präsens, Präteritum, Perfekt, auxiliary); example sentences; meaning
+- **Adjective & Other cards**: Word, meaning, optional example sentences
+- **Add Word flow**: Home → "+ Add Word" → choose type → fill form → optional example sentences
+- **Flashcards**: Every saved word becomes a flashcard; front = word, back = meaning + grammar + examples
+- **Spaced repetition (Review)**: Again (1d), Hard (3d), Good (7d), Easy (14d)
+- **Word list**: Filter by type, search by word or meaning
+- **Minimalist UI**: White background, simple typography, fast entry
+- **Navigation**: Home, Words, Flashcards, Review, Settings
+- **Database**: SQLite (Words, Sentences, Reviews) with relations
+- **Optional**: "Generate 5 (AI)" placeholder for AI-generated example sentences (wire your API in `lib/aiSentences.ts`)
+
+## Run the app
+
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Start the dev server:
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Open on device/simulator (Expo Go, or iOS/Android simulator from the terminal menu).
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Use the local Expo CLI only (`npx expo start`); do not use a global deprecated `expo-cli`.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Project structure
 
-## Get a fresh project
+- **`app/`** — Screens (expo-router): tabs (Home, Words, Flashcards, Review, Settings), add-word flow (add-word → add-noun/verb/adjective/other)
+- **`components/`** — NounCard, VerbCard, AdjectiveCard, OtherCard, WordCard, FormInput
+- **`lib/`** — `database.ts` (SQLite schema + CRUD), `wordUtils.ts` (row → Word, colors), `aiSentences.ts` (optional AI stub)
+- **`types/word.ts`** — Word types (Noun, Verb, Adjective, Other, Sentence, Review)
+- **`context/DatabaseContext.tsx`** — DB init and ready state
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+All data is stored locally with SQLite; nothing is sent to a server.

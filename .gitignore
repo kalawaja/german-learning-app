@@ -8,6 +8,7 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+.expo-shared/
 
 # Native
 .kotlin/
@@ -35,6 +36,12 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# logs
+*.log
+
+# sqlite database
+*.sqlite
 
 app-example
 
