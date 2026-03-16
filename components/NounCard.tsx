@@ -12,13 +12,15 @@ interface NounCardProps {
 }
 
 export function NounCard({ word, sentences = [], compact }: NounCardProps) {
-  const articleColor = word.article === 'die' && word.plural ? ARTICLE_COLORS['die (pl.)'] : ARTICLE_COLORS[word.article] ?? '#333';
+  const articleColor = word.article === 'die' && word.plural ? ARTICLE_COLORS['die (pl.)'] : (word.article ? ARTICLE_COLORS[word.article] : undefined) ?? '#6b7280';
 
   return (
     <View style={[styles.card, compact && styles.cardCompact]}>
-      <View style={[styles.articleBadge, { backgroundColor: articleColor }]}>
-        <Text style={styles.articleText}>{word.article}</Text>
-      </View>
+      {(word.article != null && word.article !== '') && (
+        <View style={[styles.articleBadge, { backgroundColor: articleColor }]}>
+          <Text style={styles.articleText}>{word.article}</Text>
+        </View>
+      )}
       <Text style={styles.word}>{word.word}</Text>
       {word.plural ? (
         <Text style={styles.plural}>Plural: {word.plural}</Text>

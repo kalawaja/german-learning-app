@@ -49,6 +49,18 @@ async function runMigrations(database: SQLite.SQLiteDatabase): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_sentences_word ON sentences(word_id);
     CREATE INDEX IF NOT EXISTS idx_reviews_next ON reviews(next_review_at);
   `);
+  await addAdjectiveColumnsIfNeeded(database);
+}
+
+async function addAdjectiveColumnsIfNeeded(database: SQLite.SQLiteDatabase): Promise<void> {
+  const columns = ['komparativ', 'superlativ', 'synonym', 'antonym'];
+  for (const col of columns) {
+    try {
+      await database.runAsync(`ALTER TABLE words ADD COLUMN ${col} TEXT`);
+    } catch {
+      // Column already exists (e.g. duplicate column name)
+    }
+  }
 }
 
 function getDb(): SQLite.SQLiteDatabase {
@@ -69,11 +81,15 @@ export async function insertWord(row: {
   präteritum?: string;
   perfekt?: string;
   auxiliary?: string;
+  komparativ?: string;
+  superlativ?: string;
+  synonym?: string;
+  antonym?: string;
 }): Promise<number> {
   const database = getDb();
   const result = await database.runAsync(
-    `INSERT INTO words (word, meaning, word_type, article, plural, regularity, präsens, präteritum, perfekt, auxiliary)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO words (word, meaning, word_type, article, plural, regularity, präsens, präteritum, perfekt, auxiliary, komparativ, superlativ, synonym, antonym)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       row.word,
       row.meaning,
@@ -85,6 +101,10 @@ export async function insertWord(row: {
       row.präteritum ?? null,
       row.perfekt ?? null,
       row.auxiliary ?? null,
+      row.komparativ ?? null,
+      row.superlativ ?? null,
+      row.synonym ?? null,
+      row.antonym ?? null,
     ]
   );
   return result.lastInsertRowId;
@@ -120,6 +140,10 @@ export interface WordRow {
   präteritum: string | null;
   perfekt: string | null;
   auxiliary: string | null;
+  komparativ?: string | null;
+  superlativ?: string | null;
+  synonym?: string | null;
+  antonym?: string | null;
   created_at: string;
 }
 
@@ -129,9 +153,56 @@ export async function getWordById(id: number): Promise<WordRow | null> {
   return rows[0] ?? null;
 }
 
+export async function updateWord(
+  id: number,
+  row: {
+    word: string;
+    meaning: string;
+    word_type: string;
+    article?: string | null;
+    plural?: string | null;
+    regularity?: string | null;
+    präsens?: string | null;
+    präteritum?: string | null;
+    perfekt?: string | null;
+    auxiliary?: string | null;
+    komparativ?: string | null;
+    superlativ?: string | null;
+    synonym?: string | null;
+    antonym?: string | null;
+  }
+): Promise<void> {
+  const database = getDb();
+  await database.runAsync(
+    `UPDATE words SET word = ?, meaning = ?, word_type = ?, article = ?, plural = ?, regularity = ?, präsens = ?, präteritum = ?, perfekt = ?, auxiliary = ?, komparativ = ?, superlativ = ?, synonym = ?, antonym = ? WHERE id = ?`,
+    [
+      row.word,
+      row.meaning,
+      row.word_type,
+      row.article ?? null,
+      row.plural ?? null,
+      row.regularity ?? null,
+      row.präsens ?? null,
+      row.präteritum ?? null,
+      row.perfekt ?? null,
+      row.auxiliary ?? null,
+      row.komparativ ?? null,
+      row.superlativ ?? null,
+      row.synonym ?? null,
+      row.antonym ?? null,
+      id,
+    ]
+  );
+}
+
 export async function deleteWord(id: number): Promise<void> {
   const database = getDb();
   await database.runAsync('DELETE FROM words WHERE id = ?', [id]);
+}
+
+export async function deleteSentencesByWordId(wordId: number): Promise<void> {
+  const database = getDb();
+  await database.runAsync('DELETE FROM sentences WHERE word_id = ?', [wordId]);
 }
 
 // --- Sentences ---
@@ -250,4 +321,9 @@ export async function getAllWordsWithReviews(): Promise<WordRow[]> {
   return database.getAllAsync<WordRow>(
     `SELECT w.* FROM words w INNER JOIN reviews r ON r.word_id = w.id ORDER BY w.created_at DESC`
   );
+}
+
+export async function getAllWords(): Promise<WordRow[]> {
+  const database = getDb();
+  return database.getAllAsync<WordRow>('SELECT * FROM words ORDER BY created_at DESC');
 }

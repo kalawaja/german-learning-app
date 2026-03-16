@@ -1,8 +1,6 @@
 import React from 'react';
 
-import type { WordRow } from '@/lib/database';
-import type { SentenceRow } from '@/lib/database';
-import type { Word } from '@/types/word';
+import type { WordRow, SentenceRow } from '@/lib/database';
 import { wordRowToWord } from '@/lib/wordUtils';
 import { AdjectiveCard } from '@/components/AdjectiveCard';
 import { NounCard } from '@/components/NounCard';
@@ -22,7 +20,7 @@ export function WordCard({ row, sentences = [], compact }: WordCardProps) {
     case 'noun':
       return <NounCard word={word} sentences={sentences} compact={compact} />;
     case 'verb':
-      return <VerbCard word={word} sentences={sentences} compact={compact} />;
+      return <VerbCard word={word} auxiliary={word.auxiliary} sentences={sentences} compact={compact} />;
     case 'adjective':
       return <AdjectiveCard word={word} sentences={sentences} compact={compact} />;
     case 'other':

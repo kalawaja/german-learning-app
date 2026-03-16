@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -12,14 +12,58 @@ import {
 } from 'react-native';
 
 import { FormInput } from '@/components/FormInput';
-import { insertWord, createReviewForWord, insertSentence } from '@/lib/database';
-import { generateExampleSentences } from '@/lib/aiSentences';
+import {
+  getWordById,
+  getSentencesByWordId,
+  insertWord,
+  updateWord,
+  deleteSentencesByWordId,
+  createReviewForWord,
+  insertSentence,
+} from '@/lib/database';
+import { enrichFromWiktionary } from '@/lib/enrichWord';
 
 export default function AddOtherScreen() {
+  const params = useLocalSearchParams<{ id?: string }>();
+  const editId = params.id ? parseInt(params.id, 10) : null;
   const [word, setWord] = useState('');
   const [meaning, setMeaning] = useState('');
   const [sentences, setSentences] = useState<string[]>(['']);
   const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!editId || loaded) return;
+    let cancelled = false;
+    (async () => {
+      const row = await getWordById(editId);
+      const sents = await getSentencesByWordId(editId);
+      if (!cancelled && row && row.word_type === 'other') {
+        setWord(row.word);
+        setMeaning(row.meaning);
+        setSentences(sents.length ? sents.map((s) => s.sentence) : ['']);
+        setLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, loaded]);
+
+  useEffect(() => {
+    if (editId) return;
+    const w = word.trim();
+    if (!w) return;
+    const t = setTimeout(() => {
+      enrichFromWiktionary(w).then((data) => {
+        if (data.meaning && !meaning) setMeaning(data.meaning);
+        if (data.exampleSentences?.length && sentences.join('').trim().length === 0) {
+          setSentences(data.exampleSentences);
+        }
+      });
+    }, 500);
+    return () => clearTimeout(t);
+  }, [editId, word, meaning, sentences]);
 
   const addSentence = () => setSentences((s) => [...s, '']);
   const setSentence = (i: number, v: string) =>
@@ -30,36 +74,41 @@ export default function AddOtherScreen() {
     });
   const removeSentence = (i: number) => setSentences((s) => s.filter((_, idx) => idx !== i));
 
-  const generateWithAI = async () => {
-    const w = word.trim();
-    const m = meaning.trim();
-    if (!w || !m) return;
-    const generated = await generateExampleSentences(w, m, 'other');
-    if (generated.length > 0) setSentences(generated);
-  };
-
   const save = async () => {
     const w = word.trim();
     const m = meaning.trim();
     if (!w || !m) {
-      Alert.alert('Missing fields', 'Please enter word and meaning.');
+      Alert.alert('Fehlende Angaben', 'Bitte Wort und Bedeutung eingeben.');
       return;
     }
     setSaving(true);
     try {
-      const id = await insertWord({
-        word: w,
-        meaning: m,
-        word_type: 'other',
-      });
-      const toInsert = sentences.map((s) => s.trim()).filter(Boolean);
-      for (let i = 0; i < toInsert.length; i++) {
-        await insertSentence(id, toInsert[i], i);
+      if (editId) {
+        await updateWord(editId, {
+          word: w,
+          meaning: m,
+          word_type: 'other',
+        });
+        await deleteSentencesByWordId(editId);
+        const toInsert = sentences.map((s) => s.trim()).filter(Boolean);
+        for (let i = 0; i < toInsert.length; i++) {
+          await insertSentence(editId, toInsert[i], i);
+        }
+      } else {
+        const id = await insertWord({
+          word: w,
+          meaning: m,
+          word_type: 'other',
+        });
+        const toInsert = sentences.map((s) => s.trim()).filter(Boolean);
+        for (let i = 0; i < toInsert.length; i++) {
+          await insertSentence(id, toInsert[i], i);
+        }
+        await createReviewForWord(id);
       }
-      await createReviewForWord(id);
       router.back();
-    } catch (e) {
-      Alert.alert('Error', 'Could not save word.');
+    } catch {
+      Alert.alert('Fehler', 'Wort konnte nicht gespeichert werden.');
     } finally {
       setSaving(false);
     }
@@ -76,19 +125,14 @@ export default function AddOtherScreen() {
         <FormInput label="Meaning" value={meaning} onChangeText={setMeaning} placeholder="e.g. today" />
         <View style={styles.wrap}>
           <View style={styles.sentenceHeader}>
-            <Text style={styles.label}>Example sentences (optional)</Text>
-            <View style={styles.sentenceActions}>
-              <Pressable onPress={generateWithAI}>
-                <Text style={styles.aiButton}>Generate 5 (AI)</Text>
-              </Pressable>
-              <Pressable onPress={addSentence}>
-                <Text style={styles.addSentence}>+ Add</Text>
-              </Pressable>
-            </View>
+            <Text style={styles.label}>Beispielsätze (optional)</Text>
+            <Pressable onPress={addSentence}>
+              <Text style={styles.addSentence}>+ Add</Text>
+            </Pressable>
           </View>
           {sentences.map((s, i) => (
             <View key={i} style={styles.sentenceRow}>
-              <FormInput label="" value={s} onChangeText={(v) => setSentence(i, v)} placeholder="e.g. Heute ist Montag." multiline />
+              <FormInput label="" value={s} onChangeText={(v) => setSentence(i, v)} placeholder="z. B. Heute ist Montag." multiline />
               {sentences.length > 1 && (
                 <Pressable onPress={() => removeSentence(i)} style={styles.removeBtn}>
                   <Text style={styles.removeText}>Remove</Text>
@@ -98,7 +142,7 @@ export default function AddOtherScreen() {
           ))}
         </View>
         <Pressable style={[styles.saveBtn, saving && styles.saveBtnDisabled]} onPress={save} disabled={saving}>
-          <Text style={styles.saveBtnText}>{saving ? 'Saving…' : 'Save'}</Text>
+          <Text style={styles.saveBtnText}>{saving ? 'Speichern…' : 'Speichern'}</Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -111,10 +155,8 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 24, paddingBottom: 48 },
   wrap: { marginBottom: 16 },
   label: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 8 },
-  sentenceHeader: { marginBottom: 8 },
-  sentenceActions: { flexDirection: 'row', gap: 16, marginTop: 4 },
+  sentenceHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   addSentence: { fontSize: 14, color: '#0a7ea4', fontWeight: '600' },
-  aiButton: { fontSize: 14, color: '#6b7280', fontWeight: '500' },
   sentenceRow: { marginBottom: 12 },
   removeBtn: { alignSelf: 'flex-end', marginTop: -8, marginBottom: 8 },
   removeText: { fontSize: 14, color: '#dc2626' },

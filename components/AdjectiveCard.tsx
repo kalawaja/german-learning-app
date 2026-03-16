@@ -11,10 +11,19 @@ interface AdjectiveCardProps {
 }
 
 export function AdjectiveCard({ word, sentences = [], compact }: AdjectiveCardProps) {
+  const hasForms = word.komparativ || word.superlativ || word.synonym || word.antonym;
   return (
     <View style={[styles.card, compact && styles.cardCompact]}>
       <Text style={styles.word}>{word.word}</Text>
       <Text style={styles.meaning}>{word.meaning}</Text>
+      {hasForms && !compact && (
+        <View style={styles.forms}>
+          {word.komparativ ? <Text style={styles.formLine}>Komparativ: {word.komparativ}</Text> : null}
+          {word.superlativ ? <Text style={styles.formLine}>Superlativ: {word.superlativ}</Text> : null}
+          {word.synonym ? <Text style={styles.formLine}>Synonym: {word.synonym}</Text> : null}
+          {word.antonym ? <Text style={styles.formLine}>Gegenwort: {word.antonym}</Text> : null}
+        </View>
+      )}
       {sentences.length > 0 && !compact && (
         <View style={styles.sentences}>
           {sentences.map((s) => (
@@ -47,6 +56,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#374151',
     marginBottom: 8,
+  },
+  forms: {
+    marginBottom: 8,
+    paddingTop: 4,
+  },
+  formLine: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 2,
   },
   sentences: {
     marginTop: 8,

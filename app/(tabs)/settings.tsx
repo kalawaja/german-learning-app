@@ -9,23 +9,23 @@ export default function SettingsScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
+        <Text style={styles.sectionTitle}>Über</Text>
         <Text style={styles.body}>
-          German Vocabulary — a minimalist app to learn and review German words with spaced repetition.
+          Deutsch Vokabeln — eine einfache App zum Lernen und Wiederholen deutscher Wörter mit Karteikarten.
         </Text>
       </View>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>How it works</Text>
+        <Text style={styles.sectionTitle}>So funktioniert es</Text>
         <Text style={styles.body}>
-          • Add words (nouns, verbs, adjectives, other) with optional example sentences.{'\n'}
-          • Each word becomes a flashcard. Use the Flashcards tab to flip and review.{'\n'}
-          • Words are scheduled for review. Use the Review tab and rate: Again (1d), Hard (3d), Good (7d), Easy (14d).
+          • Wörter (Nomen, Verben, Adjektive, Sonstiges) mit optionalen Beispielsätzen hinzufügen.{'\n'}
+          • Jedes Wort wird eine Lernkarte. Unter Lernkarten kannst du umblättern und wiederholen.{'\n'}
+          • Beim Wiederholen bewerten: Nochmal (1d), Schwer (3d), Gut (7d), Einfach (14d).
         </Text>
       </View>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Data</Text>
+        <Text style={styles.sectionTitle}>Daten</Text>
         <Text style={styles.body}>
-          All data is stored locally on your device using SQLite. Nothing is sent to any server.
+          Alle Daten werden nur auf deinem Gerät (SQLite) gespeichert. Nichts wird an Server gesendet.
         </Text>
       </View>
     </ScrollView>

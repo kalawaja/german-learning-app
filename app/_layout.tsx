@@ -18,11 +18,11 @@ export default function RootLayout() {
       <DatabaseProvider>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="add-word" options={{ presentation: 'modal', title: 'Add Word', headerShown: true }} />
+          <Stack.Screen name="add-word" options={{ presentation: 'modal', title: 'Wort hinzufügen', headerShown: true }} />
           <Stack.Screen name="add-noun" options={{ title: 'Add Noun', headerShown: true }} />
-          <Stack.Screen name="add-verb" options={{ title: 'Add Verb', headerShown: true }} />
-          <Stack.Screen name="add-adjective" options={{ title: 'Add Adjective', headerShown: true }} />
-          <Stack.Screen name="add-other" options={{ title: 'Add Word', headerShown: true }} />
+          <Stack.Screen name="add-verb" options={{ title: 'Verb hinzufügen', headerShown: true }} />
+          <Stack.Screen name="add-adjective" options={{ title: 'Adjektiv hinzufügen', headerShown: true }} />
+          <Stack.Screen name="add-other" options={{ title: 'Wort hinzufügen', headerShown: true }} />
         </Stack>
         <StatusBar style="auto" />
       </DatabaseProvider>

@@ -1,24 +1,41 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import type { VerbWord } from '@/types/word';
+import type { AuxiliaryFlags, VerbWord } from '@/types/word';
 import type { SentenceRow } from '@/lib/database';
 
 interface VerbCardProps {
   word: VerbWord;
+  /** Current auxiliary flags; Perfekt display uses this prop directly (no cached/string value). */
+  auxiliary?: AuxiliaryFlags;
   sentences?: SentenceRow[];
   compact?: boolean;
 }
 
-export function VerbCard({ word, sentences = [], compact }: VerbCardProps) {
+/** Derive Perfekt label from flags only (no DB string conversion). */
+function formatAuxiliaryFromFlags(aux: AuxiliaryFlags | undefined): string {
+  if (!aux) return '';
+  const parts: string[] = [];
+  if (aux.haben) parts.push('haben');
+  if (aux.sein) parts.push('sein');
+  return parts.length > 0 ? ` (${parts.join(', ')})` : '';
+}
+
+export function VerbCard({ word, auxiliary, sentences = [], compact }: VerbCardProps) {
   const isRegular = word.regularity === 'regelmäßig';
-  const bgColor = isRegular ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)';
+  const currentAuxiliary = auxiliary ?? word.auxiliary;
+  const auxiliaryLabel = formatAuxiliaryFromFlags(currentAuxiliary);
+  const bgColor = word.regularity != null
+    ? (isRegular ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)')
+    : 'rgba(107, 114, 128, 0.12)';
 
   return (
     <View style={[styles.card, { backgroundColor: bgColor }, compact && styles.cardCompact]}>
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>{word.regularity}</Text>
-      </View>
+      {word.regularity != null && word.regularity !== '' && (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{word.regularity}</Text>
+        </View>
+      )}
       <Text style={styles.word}>{word.word}</Text>
       <Text style={styles.meaning}>{word.meaning}</Text>
       {!compact && (
@@ -33,7 +50,7 @@ export function VerbCard({ word, sentences = [], compact }: VerbCardProps) {
           </View>
           <View style={styles.grammar}>
             <Text style={styles.grammarLabel}>Perfekt:</Text>
-            <Text style={styles.grammarValue}>{word.perfekt || '—'} ({word.auxiliary})</Text>
+            <Text style={styles.grammarValue}>{word.perfekt || '—'}{auxiliaryLabel}</Text>
           </View>
           {sentences.length > 0 && (
             <View style={styles.sentences}>

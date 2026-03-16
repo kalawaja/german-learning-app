@@ -4,7 +4,11 @@ export type Article = 'der' | 'die' | 'das';
 
 export type VerbRegularity = 'regelmäßig' | 'unregelmäßig';
 
-export type Auxiliary = 'haben' | 'sein';
+/** Hilfsverb as boolean flags so both können be selected. */
+export interface AuxiliaryFlags {
+  haben: boolean;
+  sein: boolean;
+}
 
 export interface Conjugation {
   person: string;
@@ -21,21 +25,25 @@ export interface WordBase {
 
 export interface NounWord extends WordBase {
   wordType: 'noun';
-  article: Article;
-  plural: string;
+  article?: Article;
+  plural?: string;
 }
 
 export interface VerbWord extends WordBase {
   wordType: 'verb';
-  regularity: VerbRegularity;
-  präsens: string;
-  präteritum: string;
-  perfekt: string;
-  auxiliary: Auxiliary;
+  regularity?: VerbRegularity;
+  präsens?: string;
+  präteritum?: string;
+  perfekt?: string;
+  auxiliary?: AuxiliaryFlags;
 }
 
 export interface AdjectiveWord extends WordBase {
   wordType: 'adjective';
+  komparativ?: string;
+  superlativ?: string;
+  synonym?: string;
+  antonym?: string;
 }
 
 export interface OtherWord extends WordBase {

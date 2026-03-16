@@ -15,7 +15,7 @@ export default function HomeScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#0a7ea4" />
-        <Text style={styles.loadingText}>Loading…</Text>
+        <Text style={styles.loadingText}>Laden…</Text>
       </View>
     );
   }
@@ -23,20 +23,20 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>German Vocabulary</Text>
-        <Text style={styles.subtitle}>Add words and review with spaced repetition.</Text>
+        <Text style={styles.title}>Deutsch Vokabeln</Text>
+        <Text style={styles.subtitle}>Wörter hinzufügen und mit Karteikarten wiederholen.</Text>
         <Pressable style={styles.addButton} onPress={handleAddWord}>
-          <Text style={styles.addButtonText}>+ Add Word</Text>
+          <Text style={styles.addButtonText}>+ Wort hinzufügen</Text>
         </Pressable>
         <View style={styles.quickLinks}>
           <Pressable style={styles.link} onPress={() => router.push('/(tabs)/words')}>
-            <Text style={styles.linkText}>Words</Text>
+            <Text style={styles.linkText}>Wörter</Text>
           </Pressable>
           <Pressable style={styles.link} onPress={() => router.push('/(tabs)/flashcards')}>
-            <Text style={styles.linkText}>Flashcards</Text>
+            <Text style={styles.linkText}>Lernkarten</Text>
           </Pressable>
           <Pressable style={styles.link} onPress={() => router.push('/(tabs)/review')}>
-            <Text style={styles.linkText}>Review</Text>
+            <Text style={styles.linkText}>Wiederholen</Text>
           </Pressable>
         </View>
       </View>

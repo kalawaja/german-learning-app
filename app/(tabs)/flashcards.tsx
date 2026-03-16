@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -14,8 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { WordCard } from '@/components/WordCard';
 import { useDatabaseReady } from '@/context/DatabaseContext';
 import { getAllWordsWithReviews, getSentencesByWordId } from '@/lib/database';
-import type { WordRow } from '@/lib/database';
-import type { SentenceRow } from '@/lib/database';
+import type { WordRow, SentenceRow } from '@/lib/database';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 48;
@@ -68,10 +67,10 @@ export default function FlashcardsScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>
-          {words.length} flashcard{words.length !== 1 ? 's' : ''}
+          {words.length} Lernkarte{words.length !== 1 ? 'n' : ''}
         </Text>
         <Pressable onPress={() => router.push('/add-word')}>
-          <Text style={styles.addLink}>+ Add Word</Text>
+          <Text style={styles.addLink}>+ Wort hinzufügen</Text>
         </Pressable>
       </View>
       {loading ? (
@@ -80,10 +79,10 @@ export default function FlashcardsScreen() {
         </View>
       ) : words.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>No flashcards yet.</Text>
-          <Text style={styles.emptySub}>Every saved word becomes a flashcard. Add words from Home.</Text>
+          <Text style={styles.emptyText}>Noch keine Lernkarten.</Text>
+          <Text style={styles.emptySub}>Jedes gespeicherte Wort wird eine Karte. Füge Wörter über die Startseite hinzu.</Text>
           <Pressable style={styles.emptyBtn} onPress={() => router.push('/add-word')}>
-            <Text style={styles.emptyBtnText}>+ Add Word</Text>
+            <Text style={styles.emptyBtnText}>+ Wort hinzufügen</Text>
           </Pressable>
         </View>
       ) : (
@@ -103,7 +102,7 @@ export default function FlashcardsScreen() {
                 {!flipped[item.id] ? (
                   <View style={styles.front}>
                     <Text style={styles.frontWord}>{item.word}</Text>
-                    <Text style={styles.tapHint}>Tap to flip</Text>
+                    <Text style={styles.tapHint}>Tippen zum Umblättern</Text>
                   </View>
                 ) : (
                   <View style={styles.back}>

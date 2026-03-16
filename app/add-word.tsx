@@ -5,10 +5,9 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { WordType } from '@/types/word';
 
 const WORD_TYPES: { type: WordType; label: string }[] = [
-  { type: 'noun', label: 'Noun' },
+  { type: 'noun', label: 'Nomen' },
   { type: 'verb', label: 'Verb' },
-  { type: 'adjective', label: 'Adjective' },
-  { type: 'other', label: 'Other' },
+  { type: 'adjective', label: 'Adjektiv' },
 ];
 
 export default function AddWordTypeScreen() {
@@ -19,8 +18,8 @@ export default function AddWordTypeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Add Word</Text>
-        <Text style={styles.subtitle}>Choose the word type</Text>
+        <Text style={styles.title}>Wort hinzufügen</Text>
+        <Text style={styles.subtitle}>Wortart wählen</Text>
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {WORD_TYPES.map(({ type, label }) => (

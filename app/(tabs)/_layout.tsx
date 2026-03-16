@@ -26,7 +26,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Startseite',
           tabBarIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
         }}
       />
@@ -40,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="flashcards"
         options={{
-          title: 'Flashcards',
+          title: 'Lernkarten',
           tabBarIcon: ({ color }) => <IconSymbol size={24} name="rectangle.stack.fill" color={color} />,
         }}
       />
@@ -54,7 +54,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: 'Einstellungen',
           tabBarIcon: ({ color }) => <IconSymbol size={24} name="gearshape.fill" color={color} />,
         }}
       />

@@ -23,7 +23,13 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "German Learning",
+      "shortName": "German Learning",
+      "themeColor": "#0a7ea4",
+      "backgroundColor": "#ffffff",
+      "display": "standalone",
+      "startUrl": "."
     },
     "plugins": [
       "expo-router",
